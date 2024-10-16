@@ -1,11 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hu">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Szópárosító játék</title>
+    <style>
+        body{
+            background-color: aqua;
+        }
+        h1 {
+            text-align: center;
+        }
+        #start {
+            text-align: center;
+        }
+        #startgomb {
+            padding: 8px;
+        }
+        #mezo {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding: 0 90px;
+        }
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+        }
+        .szavak {
+            margin: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border: 1px solid gray;
+            background-color: white;
+            width: 100px;
+            text-align: center;
+        }
+        #sikeressor, #sikertelensor {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .correct {
+            background-color: green;
+            transition: 0.5s;
+        }
+        .incorrect {
+            background-color: red;
+        }
+    </style>
 </head>
 <body>
-    
+    <h1>Nyelvtanulás</h1>
+    <div id="start"><button id="startgomb">Start</button></div>
+    <div id="mezo">
+        <div id="huColumn" class="column"></div>
+        <div id="enColumn" class="column"></div>
+    </div>
+    <div id="sikeressor">Sikeres próbálkozások: <div id="sikeres">0</div></div>
+    <div id="sikertelensor">Sikertelen próbálkozások: <div id="sikertelen">0</div></div>
+
+    <script>
+        const szavak = [
+            {hu: "alma", en: "apple"},
+            {hu: "ház", en: "house"},
+            {hu: "kutya", en: "dog"},
+            {hu: "macska", en: "cat"},
+            {hu: "könyv", en: "book"},
+            {hu: "autó", en: "car"},
+            {hu: "bicikli", en: "bicycle"},
+            {hu: "ablak", en: "window"},
+            {hu: "szék", en: "chair"},
+            {hu: "asztal", en: "table"}
+        ];
+
+        let magyar= null;
+        let angol = null;
+        let sikeres = 0;
+        let sikertelen = 0;
+
+        document.getElementById("startgomb").addEventListener("click", function() {
+            startGame();
+        });
+
+        function startGame() {
+            sikeres = 0;
+            sikertelen = 0;
+            document.getElementById("sikeres").textContent = sikeres;
+            document.getElementById("sikertelen").textContent = sikertelen;
+
+            const huColumn = document.getElementById("huColumn");
+            const enColumn = document.getElementById("enColumn");
+            huColumn.innerHTML = ""; 
+            enColumn.innerHTML = ""; 
+
+            const shuffledHu = szavak.map(szo => szo.hu).sort(() => Math.random() - 0.5);
+            const shuffledEn = szavak.map(szo => szo.en).sort(() => Math.random() - 0.5);
+
+            shuffledHu.forEach(hu => {
+                const huButton = document.createElement("button");
+                huButton.classList.add("szavak");
+                huButton.textContent = hu;
+                huButton.addEventListener("click", function() {
+                    selectWord(hu, "hu", huButton);
+                });
+                huColumn.appendChild(huButton);
+            });
+
+            shuffledEn.forEach(en => {
+                const enButton = document.createElement("button");
+                enButton.classList.add("szavak");
+                enButton.textContent = en;
+                enButton.addEventListener("click", function() {
+                    selectWord(en, "en", enButton);
+                });
+                enColumn.appendChild(enButton);
+            });
+        }
+
+        function selectWord(word, type, button) {
+            if (type === "hu") {
+                magyar = { word, button };
+            } else {
+                angol = { word, button };
+            }
+
+            if (magyar && angol) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const pair = szavak.find(szo => szo.hu === magyar.word && szo.en === angol.word);
+
+            if (pair) {
+                sikeres++;
+                document.getElementById("sikeres").textContent = sikeres;
+                magyar.button.classList.add("correct");
+                angol.button.classList.add("correct");
+            } else {
+                sikertelen++;
+                document.getElementById("sikertelen").textContent = sikertelen;
+                setTimeout(angol.button.classList.add("incorrect"),1000);
+                setTimeout(magyar.button.classList.add("incorrect"),1000);
+            }
+        }
+    </script>
 </body>
 </html>
